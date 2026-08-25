@@ -1,0 +1,84 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # image: acme-api:latest
+    container_name: acme-api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # Fixed values
+      - PORT=8080
+      - NODE_ENV=production
+      # ── All remaining vars are forwarded from shell / hosting platform ──
+      # Database
+      - DATABASE_URL=postgresql://user:password@db-host:5432/acmemarketplace?schema=public
+      # CORS
+      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000,https://acmemarketplace.example.com
+      # Google OAuth
+      - GOOGLE_CLIENT_ID=<YOUR_GOOGLE_CLIENT_ID>
+      - GOOGLE_CLIENT_SECRET=<YOUR_GOOGLE_CLIENT_SECRET>
+      # S3 / Object Storage
+      - ENDPOINT=<YOUR_STORAGE_ENDPOINT>
+      - BUCKET_NAME=acme-marketplace-media
+      - ACCESS_KEY_ID=<YOUR_ACCESS_KEY_ID>
+      - SECRET_ACCESS_KEY=<YOUR_SECRET_ACCESS_KEY>
+      - DEFAULT_AVATAR_URL=placeholders/profile-placeholder.png
+      - DEFAULT_IMAGE_URL=placeholders/image-placeholder.png
+      # Auth & Security
+      - JWT_SECRET=<YOUR_JWT_SECRET>
+      - BCRYPT_SALT_OR_ROUNDS=10
+      - ACCESS_TOKEN_COOKIE_NAME=acme-access-token
+      - ADMIN_SESSION_SECRET=<YOUR_ADMIN_SESSION_SECRET>
+      # Redis
+      - REDIS_HOST=localhost
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=<YOUR_REDIS_PASSWORD>
+      # Email (SMTP)
+      - SMTP_HOST=<YOUR_SMTP_HOST>
+      - SMTP_PORT=587
+      - SMTP_USER=<YOUR_SMTP_USER>
+      - SMTP_PASS=<YOUR_SMTP_PASS>
+      - SMTP_FROM=Acme Marketplace <support@acmemarketplace.example.com>
+      # Application URLs
+      - APP_URL=http://localhost:8080
+      - VERIFY_EMAIL_URL_WEBHOOKS=http://localhost:8080
+      # Twilio (SMS)
+      - TWILIO_ACCOUNT_SID=<YOUR_TWILIO_ACCOUNT_SID>
+      - TWILIO_AUTH_TOKEN=<YOUR_TWILIO_AUTH_TOKEN>
+      - TWILIO_PHONE_NUMBER=<YOUR_TWILIO_PHONE_NUMBER>
+      # Seed Admin
+      - ADMIN_EMAIL=admin@acmemarketplace.example.com
+      - ADMIN_FULL_NAME=Admin User
+      - ADMIN_AVATAR_URL=placeholders/seed-admin.jpg
+      - ADMIN_PASSWORD=<YOUR_ADMIN_PASSWORD>
+    networks:
+      - app-network
+    # restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/api/v1 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+# ────────────────────────────────────────────────────────────────
+# External network shared with the DB / Redis / Bucket containers.
+#
+# Before running (first time only):
+#   docker network create acme-services
+#
+# Connect your existing service containers to it:
+#   docker network connect acme-services <db-container>
+#   docker network connect acme-services <redis-container>
+#   docker network connect acme-services <bucket-container>
+#
+# Run WITHOUT a .env file (to avoid $-interpolation warnings on secrets):
+#   docker compose --env-file /dev/null up --build
+# ────────────────────────────────────────────────────────────────
+networks:
+  app-network:
+    external: true

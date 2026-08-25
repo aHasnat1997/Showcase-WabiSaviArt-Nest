@@ -1,0 +1,46 @@
+# Dependencies
+node_modules
+admin-dashboard/node_modules
+
+# Build outputs (built inside Docker, not from host)
+dist
+admin-dashboard/dist
+
+# Environment files — never include in image
+.env
+.env.*
+!.env.example
+
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Logs
+*.log
+logs
+
+# OS / editor artifacts
+.DS_Store
+Thumbs.db
+.idea
+.vscode
+
+# Test files
+test
+**/*.spec.ts
+**/*.e2e-spec.ts
+coverage
+
+# Docker files themselves
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Docs
+*.md
+!prisma/README.md
+
+# TypeScript cache
+tsconfig.tsbuildinfo
+*.tsbuildinfo
