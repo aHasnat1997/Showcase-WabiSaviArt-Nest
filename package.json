@@ -8,9 +8,9 @@
   "license": "UNLICENSED",
   "scripts": {
     "build:admin": "cd admin-dashboard && npm run build && cp -r public/* dist/ 2>/dev/null || true",
-    "build": "node api.js && nest build && npm run build:admin",
+    "build": "nest build && npm run build:admin",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "node api.js && nest start",
+    "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "bun run build && bun dist/src/main.js",
